@@ -4,6 +4,10 @@
 // environment map and reports missing required keys as errors and
 // undeclared extra keys as warnings.
 //
+// A key in the schema is considered required if it has a non-empty value.
+// Keys with empty values in the schema are treated as optional declarations,
+// meaning their absence in the target produces no error.
+//
 // Basic usage:
 //
 //	schema, _ := envfile.Parse(schemaReader)
