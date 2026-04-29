@@ -57,3 +57,20 @@ func Map(env map[string]string, patterns []string) map[string]string {
 	}
 	return out
 }
+
+// SensitiveKeys returns a sorted list of keys from env that are considered
+// sensitive according to the provided patterns. patterns may be nil, in which
+// case DefaultSecretPatterns is used. This is useful for auditing or logging
+// which keys will be redacted without exposing their values.
+func SensitiveKeys(env map[string]string, patterns []string) []string {
+	if patterns == nil {
+		patterns = DefaultSecretPatterns
+	}
+	var keys []string
+	for k := range env {
+		if IsSensitive(k, patterns) {
+			keys = append(keys, k)
+		}
+	}
+	return keys
+}
