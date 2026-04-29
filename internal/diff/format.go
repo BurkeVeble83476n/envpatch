@@ -15,7 +15,7 @@ const (
 
 // FormatOptions controls how diff output is rendered.
 type FormatOptions struct {
-	Color   bool
+	Color       bool
 	MaskSecrets bool
 	SecretKeys  []string
 }
@@ -36,27 +36,25 @@ func Format(w io.Writer, result *Result, opts FormatOptions) {
 		return val
 	}
 
+	colorize := func(color, line string) string {
+		if opts.Color {
+			return color + line + colorReset
+		}
+		return line
+	}
+
 	for _, c := range result.Changes {
 		switch c.Type {
 		case Added:
-			line := fmt.Sprintf("+ %s=%s", c.Key, maskIfNeeded(c.Key, c.NewValue))
-			if opts.Color {
-				line = colorGreen + line + colorReset
-			}
+			line := colorize(colorGreen, fmt.Sprintf("+ %s=%s", c.Key, maskIfNeeded(c.Key, c.NewValue)))
 			fmt.Fprintln(w, line)
 		case Removed:
-			line := fmt.Sprintf("- %s=%s", c.Key, maskIfNeeded(c.Key, c.OldValue))
-			if opts.Color {
-				line = colorRed + line + colorReset
-			}
+			line := colorize(colorRed, fmt.Sprintf("- %s=%s", c.Key, maskIfNeeded(c.Key, c.OldValue)))
 			fmt.Fprintln(w, line)
 		case Changed:
 			old := maskIfNeeded(c.Key, c.OldValue)
 			new := maskIfNeeded(c.Key, c.NewValue)
-			line := fmt.Sprintf("~ %s: %s → %s", c.Key, old, new)
-			if opts.Color {
-				line = colorYellow + line + colorReset
-			}
+			line := colorize(colorYellow, fmt.Sprintf("~ %s: %s → %s", c.Key, old, new))
 			fmt.Fprintln(w, line)
 		}
 	}
