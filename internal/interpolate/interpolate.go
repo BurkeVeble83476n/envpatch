@@ -6,7 +6,6 @@ package interpolate
 import (
 	"fmt"
 	"regexp"
-	"strings"
 )
 
 // baseSyntax matches ${BASE:SOME_KEY} placeholders.
@@ -17,6 +16,11 @@ var baseSyntax = regexp.MustCompile(`\$\{BASE:([A-Z0-9_]+)\}`)
 type Result struct {
 	Env      map[string]string
 	Warnings []string
+}
+
+// HasWarnings reports whether the resolution produced any warnings.
+func (r *Result) HasWarnings() bool {
+	return len(r.Warnings) > 0
 }
 
 // Resolve walks every value in overlay and substitutes ${BASE:KEY} tokens
@@ -58,6 +62,5 @@ func resolveValue(s string, lookup map[string]string) (string, []string) {
 		return match // leave token intact
 	})
 
-	_ = strings.Contains // satisfy import if needed
 	return result, warnings
 }
